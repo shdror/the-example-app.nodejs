@@ -3,7 +3,7 @@ pipeline {
     agent {
                 node { label "Dev" }
                 //docker { image 'node:7-alpine' }
-            }
+    }
     stages {
         stage('Build') {
             /*agent {
@@ -73,7 +73,7 @@ pipeline {
                 //
                echo "Deploying..."
             }
-        }*/
+        }
     }
 }
 
