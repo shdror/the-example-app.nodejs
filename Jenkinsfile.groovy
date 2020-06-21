@@ -48,6 +48,7 @@ pipeline {
             }
             steps {
                 //
+             script {
               try {
                echo "Testing..."
                 sh """
@@ -62,6 +63,7 @@ pipeline {
                  currentBuild.result="UNSTABLE"
               }
             }
+           }
         }
         stage('Deploy') {
             agent {
