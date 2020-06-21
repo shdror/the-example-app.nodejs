@@ -1,16 +1,26 @@
 pipeline {
-    agent none
-    stages {
-        stage('use docker') {
-            agent {
-                node { label "master" }
+    //agent none
+    agent {
+                node { label "Dev" }
                 //docker { image 'node:7-alpine' }
             }
+    stages {
+        stage('Build') {
+            /*agent {
+                node { label "Dev" }
+                //docker { image 'node:7-alpine' }
+            }*/
             steps {
                 //docker
                 echo "docker in use?"
-                sh "docker build -t the-example-app.nodejs ."
-                sh "docker run -p 3000:3000 -d the-example-app.nodejs"
+                sh """
+                    docker build -t the-example-app.nodejs .
+                    docker_container=`docker run -p 3000:3000 -d the-example-app.nodejs`
+                    # npm run test:unit
+                    echo \$docker_container
+                    docker stop \$docker_container
+                    npm pack
+                    """
 
             }
         }
@@ -29,7 +39,7 @@ pipeline {
                sh "npm pack"
                echo "upload to artifactory"
             }
-        }
+        }*/
         stage('Test') {
             agent {
                 node {
@@ -38,10 +48,19 @@ pipeline {
             }
             steps {
                 //
+              try {
                echo "Testing..."
-               sh "npm run start:dev &"
-               sh "sleep 60 && npm test"
-
+                sh """
+                    docker_container=`docker run -p 3000:3000 -d the-example-app.nodejs`
+                    npm run test:unit
+                    echo \$docker_container
+                    docker stop \$docker_container
+                    npm pack
+                    """
+              }
+              catch (all) {
+                 currentBuild.result="UNSTABLE"
+              }
             }
         }
         stage('Deploy') {
@@ -57,5 +76,6 @@ pipeline {
         }*/
     }
 }
+
 
 
