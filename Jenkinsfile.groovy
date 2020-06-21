@@ -1,21 +1,40 @@
 pipeline {
-    agent any 
+    agent none
     stages {
-        stage('Build') { 
+        stage('Build') {
+            agent {
+                node {
+                    label "master"
+                }
+            }
             steps {
-                // 
+                //
                echo "Building..."
+               sh "npm install"
             }
         }
-        stage('Test') { 
+        stage('Test') {
+            agent {
+                node {
+                    label "Dev"
+                }
+            }
             steps {
-                // 
+                //
                echo "Testing..."
+               sh "npm run start:dev &"
+               sh "sleep 60 && npm test"
+
             }
         }
-        stage('Deploy') { 
+        stage('Deploy') {
+            agent {
+                node {
+                    label "Dev"
+                }
+            }
             steps {
-                // 
+                //
                echo "Deploying..."
             }
         }
